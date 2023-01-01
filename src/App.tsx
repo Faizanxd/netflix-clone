@@ -1,6 +1,6 @@
 import { createRoutesFromElements, Route, RouterProvider } from "react-router";
 import { createBrowserRouter } from "react-router-dom";
-import Browse from "./components/browse";
+import Browse from "./pages/browse";
 import Layout from "./components/layout";
 
 function AppRouter() {
@@ -11,6 +11,9 @@ function AppRouter() {
         <Route path="/login" element={<h2>login</h2>} />
         <Route path="/browse" element={<Layout />}>
           <Route index element={<Browse />} />
+        </Route>
+        <Route path="/latest" element={<Layout />}>
+          <Route index element={<h1>latest</h1>} />
         </Route>
       </>
     )
