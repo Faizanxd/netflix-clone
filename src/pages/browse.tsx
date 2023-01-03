@@ -1,10 +1,11 @@
 import { ENDPOINT } from "../common/endpoints";
+import Banner from "../components/Banner";
 import ContentRows from "../components/content-row";
 
 export default function Browse() {
   return (
-    <section>
-      <section>Banner Image</section>
+    <section className="absolute top-0">
+      <Banner />
       <ContentRows endpoint={ENDPOINT.MOVIES_POPULAR} title="New & Popular" />
       <ContentRows endpoint={ENDPOINT.MOVIES_TOP_RATED} title="Top Rated" />
       <ContentRows endpoint={ENDPOINT.MOVIES_NOW_PLAYING} title="Now Playing" />

@@ -72,14 +72,14 @@ export default function ContentRows({ title, endpoint }: RowProps) {
 
   return (
     <section className="row-container ml-12 hover:cursor-pointer">
-      <h2 className="mb-4">{title}</h2>
+      <h2 className="text-xl">{title}</h2>
       <PageIndicator
         pagesCount={pagesCount}
         currentPage={currentPage}
-        className="pr-4 opacity-0 transition-opacity duration-300 ease-in"
+        className=" pr-4 opacity-0 transition-opacity duration-300 ease-in"
       />
       <section
-        className="relative flex flex-nowrap gap-2 overflow-hidden"
+        className="relative mb-8 flex flex-nowrap gap-2 overflow-hidden"
         ref={containerRef}
       >
         {!disablePrev ? (
@@ -103,7 +103,9 @@ export default function ContentRows({ title, endpoint }: RowProps) {
           ref={sliderRef}
         >
           {rowData?.map((row, index) => {
-            return <MovieCard {...row} key={`${row.id}-${index}`} />;
+            return (
+              <MovieCard {...row} key={`${row.id}-${index}`} index={index} />
+            );
           })}
         </section>
       </section>
