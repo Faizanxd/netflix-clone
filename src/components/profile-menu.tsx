@@ -1,11 +1,15 @@
 import ChevronDownIcon from "@heroicons/react/24/outline/ChevronDownIcon";
-import { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../common/auth";
 import profileImage from "/src/assets/profile.png";
 
 export default function ProfileMenu() {
+  const navigate = useNavigate();
+  const { signOut } = useAuth();
   const [showMenu, setShowMenu] = useState(false);
   const profileMenuContainer = useRef<HTMLSelectElement>(null);
-  const timerId = useRef(0);
+  const timerId = useRef<any>(0);
   function onMouseEnter() {
     if (timerId.current) {
       clearTimeout(timerId.current);
@@ -34,6 +38,11 @@ export default function ProfileMenu() {
     };
   }, []);
 
+  async function signOutOfNetflix() {
+    await signOut();
+    navigate("/login");
+  }
+
   return (
     <section className="relative " ref={profileMenuContainer}>
       <section className="flex items-center gap-2">
@@ -56,7 +65,10 @@ export default function ProfileMenu() {
           <li>Transfer Profiles</li>
           <li>Account</li>
           <li>Help Center</li>
-          <li className="-mx-4 border-t border-t-gray-500 px-4 pt-2">
+          <li
+            onClick={signOutOfNetflix}
+            className="-mx-4 border-t border-t-gray-500 px-4 pt-2"
+          >
             Sign Out of Netflix
           </li>
         </ul>

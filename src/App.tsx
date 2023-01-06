@@ -11,13 +11,18 @@ import Layout from "./components/layout";
 import Login from "./pages/login";
 import { AuthProvider, useAuth } from "./common/auth";
 import Profile from "./pages/profile";
+import ProfilesProvider from "./common/profiles-context";
 
 function ProtectedRoute({ children }: { children: React.ReactElement }) {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
+  // if (!user && !loading) {
+  //   return <Navigate to="/login" />;
+  // }
   return children;
 }
 
 function AppRouter() {
+  const { loading, user } = useAuth();
   const router = createBrowserRouter(
     createRoutesFromElements(
       <>
@@ -42,13 +47,21 @@ function AppRouter() {
       </>
     )
   );
-  return <RouterProvider router={router} />;
+  return loading && !user ? (
+    <section className="grid h-screen w-screen place-items-center text-6xl">
+      Loading
+    </section>
+  ) : (
+    <RouterProvider router={router} />
+  );
 }
 
 export default function App() {
   return (
     <AuthProvider>
-      <AppRouter />
+      <ProfilesProvider>
+        <AppRouter />
+      </ProfilesProvider>
     </AuthProvider>
   );
 }

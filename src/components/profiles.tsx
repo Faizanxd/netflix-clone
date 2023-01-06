@@ -4,12 +4,24 @@ import profileImage from "../assets/profile.png";
 import PencilIcon from "@heroicons/react/24/outline/PencilIcon";
 import PlusCircle from "@heroicons/react/24/solid/PlusCircleIcon";
 import Modal from "./modal";
+import {
+  useProfilesContext,
+  useProfilesDispatchContext,
+} from "../common/profiles-context";
+import { ActionType, UserProfile } from "../common/types";
 
 export default function Profiles({ edit }: { edit: boolean }) {
   const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
+  const userProfiles = useProfilesContext();
+  const dispatch = useProfilesDispatchContext() as React.Dispatch<ActionType>;
+  const [profile, setProfile] = useState<UserProfile>();
   const navigate = useNavigate();
   function manageProfiles() {
     navigate("/ManageProfiles");
+  }
+  function onProfileClick(profile: UserProfile) {
+    dispatch({ type: "current", payload: profile });
+    navigate("/browse");
   }
   const heading = !edit ? "Who's watching?" : "Manage Profiles:";
   function closeEditor() {
@@ -18,23 +30,50 @@ export default function Profiles({ edit }: { edit: boolean }) {
   function openEditor() {
     setIsEditProfileOpen(true);
   }
+  function onAddProfile() {
+    const newProfile: UserProfile = {
+      id: "",
+      name: "",
+      imageUrl: profileImage,
+    };
+    setProfile(newProfile);
+    openEditor();
+  }
+  function onSaveProfile(profile: UserProfile) {
+    const action: ActionType = {
+      type: profile.id ? "edit" : "add",
+      payload: profile,
+    };
+    dispatch(action);
+    setIsEditProfileOpen(false);
+  }
   return (
     <>
       <h1 className="mb-8 text-6xl">{heading}</h1>
       <section className="flex gap-4">
-        <ProfileCard onEditClick={openEditor} edit={edit} />
-        <ProfileCard onEditClick={openEditor} edit={edit} />
-        <AddProfile />
+        {userProfiles?.profiles?.map((profile) => (
+          <ProfileCard
+            onProfileClick={onProfileClick}
+            profile={profile as UserProfile}
+            onEditClick={openEditor}
+            edit={edit}
+          />
+        ))}
+        <AddProfile onAddProfile={onAddProfile} />
       </section>
+      {profile ? (
+        <EditProfile
+          edit={edit}
+          isOpen={isEditProfileOpen}
+          title={""}
+          onClose={closeEditor}
+          profile={profile}
+          onSave={onSaveProfile}
+        ></EditProfile>
+      ) : null}
       {edit ? (
         <>
           <ProfileButton>Done</ProfileButton>
-          <EditProfile
-            edit={edit}
-            isOpen={isEditProfileOpen}
-            title={""}
-            onClose={closeEditor}
-          ></EditProfile>
         </>
       ) : (
         <ProfileButton
@@ -54,7 +93,7 @@ function ProfileButton({
   ...props
 }: {
   buttonType?: "primary" | "secondary";
-} & React.HTMLAttributes<HTMLButtonElement>) {
+} & React.ButtonHTMLAttributes<HTMLButtonElement>) {
   return (
     <button
       {...props}
@@ -72,32 +111,48 @@ function ProfileButton({
 function ProfileCard({
   edit,
   onEditClick,
+  profile,
+  onProfileClick,
 }: {
   edit: boolean;
-  onEditClick: () => void;
+  onEditClick: (profile: UserProfile) => void;
+  onProfileClick: (profile: UserProfile) => void;
+  profile: UserProfile;
 }) {
+  const { id, name, imageUrl } = profile;
+  function editClick(event: React.SyntheticEvent) {
+    event.stopPropagation();
+    onEditClick(profile);
+  }
   return (
-    <section className="flex cursor-pointer flex-col place-items-center gap-2 text-gray-400 hover:text-white">
+    <section
+      id={id}
+      onClick={() => onProfileClick(profile)}
+      className="flex cursor-pointer flex-col place-items-center gap-2 text-gray-400 hover:text-white"
+    >
       <section className="relative h-[10vw] max-h-[200px] min-h-[84px] w-[10vw] min-w-[84px] max-w-[200px] overflow-hidden rounded-md hover:border-4 hover:border-gray-100 ">
-        <img src={profileImage} alt="Profile Image" />
+        <img src={imageUrl} alt={name} />
         {edit ? (
           <button
             className="absolute inset-0 grid place-items-center bg-black/50"
-            onClick={onEditClick}
+            onClick={editClick}
           >
             <PencilIcon className="w-[25%] text-white" />
           </button>
         ) : null}
       </section>
-      <h1 className="text=xl">Profile Name</h1>
+      <h1 className="text=xl">{name}</h1>
     </section>
   );
 }
 
-function AddProfile() {
+function AddProfile({ onAddProfile }: { onAddProfile: () => void }) {
   return (
     <section className="flex cursor-pointer flex-col place-items-center gap-2 text-gray-400">
-      <button className="grid  h-[10vw] max-h-[200px] min-h-[84px] w-[10vw] min-w-[84px] max-w-[200px] place-items-center overflow-hidden rounded-md hover:border-4  hover:border-gray-100 hover:bg-gray-400 hover:text-white">
+      <button
+        onClick={onAddProfile}
+        className="grid  h-[10vw] max-h-[200px] min-h-[84px] w-[10vw] min-w-[84px] max-w-[200px] place-items-center overflow-hidden rounded-md hover:border-4  hover:border-gray-100 hover:bg-gray-400 hover:text-white"
+      >
         <PlusCircle className="w-[75%]" />
       </button>
     </section>
@@ -109,22 +164,41 @@ function EditProfile(props: {
   onClose: (value: boolean) => void;
   title: string;
   edit?: boolean;
+  profile: UserProfile;
+  onSave?: (profile: UserProfile) => void;
 }) {
-  const heading = props.edit ? "Edit Profile" : "Add Profile";
+  const heading = props.profile.id ? "Edit Profile" : "Add Profile";
   function cancelEdit() {
     props.onClose(false);
+  }
+  function onSubmit(event: React.FormEvent) {
+    event.preventDefault();
+    const { profileName } = event.target as typeof event.target & {
+      profileName: HTMLInputElement;
+    };
+    if (props.onSave) {
+      let profile = {
+        name: profileName.value,
+        id: props?.profile.id,
+        imageUrl: props?.profile.imageUrl,
+      };
+      props.onSave(profile);
+    }
   }
   return (
     <Modal {...props}>
       <section className="h-screen w-screen">
-        <section className="mx-auto my-16 max-w-4xl">
+        <form className="mx-auto my-16 max-w-4xl">
           <h1 className="mb-4 text-6xl">{heading}</h1>
           <section className="grid grid-cols-[200px_auto] gap-4 border-t border-b p-4 text-gray-100 ">
             <section className="aspect-square overflow-hidden rounded-md">
-              <img src={profileImage} alt="Profile Image" />
+              <img src={props.profile.imageUrl} alt="Profile Image" />
             </section>
             <section>
               <input
+                name="profileName"
+                id="profileName"
+                defaultValue={props.profile.name}
                 type="text"
                 className="w-full bg-zinc-500 p-2 outline-none"
                 placeholder="Enter Profile Name"
@@ -132,12 +206,16 @@ function EditProfile(props: {
             </section>
           </section>
           <section className="mt-8 flex gap-4">
-            <ProfileButton>Save</ProfileButton>
-            <ProfileButton buttonType="secondary" onClick={cancelEdit}>
+            <ProfileButton type="submit">Save</ProfileButton>
+            <ProfileButton
+              buttonType="secondary"
+              onClick={cancelEdit}
+              type="button"
+            >
               Cancel
             </ProfileButton>
           </section>
-        </section>
+        </form>
       </section>
     </Modal>
   );

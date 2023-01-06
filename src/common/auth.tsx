@@ -41,11 +41,13 @@ export const AuthProvider = ({
 };
 
 function useProvideAuth() {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<User | null>(auth.currentUser);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      user ? setUser(user) : setUser(null);
+      setLoading(false);
+      setUser(user);
     });
     return () => {
       unsubscribe();
@@ -54,23 +56,22 @@ function useProvideAuth() {
 
   const signUp = (email: string, password: string) =>
     createUserWithEmailAndPassword(auth, email, password).then(({ user }) => {
-      setUser(user);
       return user;
     });
 
   const signIn = (email: string, password: string) =>
     signInWithEmailAndPassword(auth, email, password).then(({ user }) => {
-      setUser(user);
       return user;
     });
 
-  const signOutUser = signOut(auth).then(() => setUser(null));
+  const signOutUser = () => signOut(auth);
 
   return {
     user,
     signUp,
     signIn,
     signOut: signOutUser,
+    loading,
   };
 }
 
