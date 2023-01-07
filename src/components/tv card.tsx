@@ -17,7 +17,7 @@ type MovieCardProps = {
   index: number;
 };
 
-export default function MovieCard({
+export default function TvCard({
   id,
   poster_path,
   title,
@@ -34,7 +34,7 @@ export default function MovieCard({
   }
 
   async function onMouseEnter(event: any) {
-    const [videoInfo] = await fetchVideoInfo(id.toString());
+    const [videoInfo] = await fetchTVInfo(id.toString());
     setVideoInfo(videoInfo);
     let calculatedPosition = movieCardRef.current?.getBoundingClientRect();
     let top = (calculatedPosition?.top ?? 0) - 100;

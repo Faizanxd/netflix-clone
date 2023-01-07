@@ -39,7 +39,7 @@ export default function SearchBar() {
       <section
         className={`${
           open
-            ? "w-full  animate-slide-rtl border border-white "
+            ? "w-full  animate-slide-rtl  border border-white"
             : "invisible h-0 w-0"
         }flex items-center gap-2 bg-dark p-1`}
       >
@@ -48,7 +48,7 @@ export default function SearchBar() {
         </button>
         <input
           ref={inputRef}
-          className="w-4 bg-dark  outline-none"
+          className="w-4 bg-dark text-white outline-none"
           type="text"
           name="searchbar"
           id="searchbar"

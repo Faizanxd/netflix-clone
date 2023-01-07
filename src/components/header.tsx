@@ -47,17 +47,17 @@ export default function Header() {
               </NavLink>
             </li>
             <li>
-              <NavLink className={isActiveLink} to="/browse/genre">
+              <NavLink className={isActiveLink} to="/Tv">
                 Tv Shows
               </NavLink>
             </li>
             <li>
-              <NavLink className={isActiveLink} to="/browse/genre/movies">
+              <NavLink className={isActiveLink} to="/Movies">
                 Movies
               </NavLink>
             </li>
             <li>
-              <NavLink className={isActiveLink} to="/latest">
+              <NavLink className={isActiveLink} to="/New&popular">
                 New & Popular
               </NavLink>
             </li>

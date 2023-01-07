@@ -61,3 +61,19 @@ export async function fetchVideoInfo(id: string) {
     (result) => result.site.toLowerCase() === "youtube"
   );
 }
+
+export async function fetchTVRequest<T>(endpoint: string) {
+  const url = new URL(endpoint, import.meta.env.VITE_BASE_API);
+  url.searchParams.append("api_key", import.meta.env.VITE_API_KEY);
+  const response = await fetch(url);
+  return response.json() as Promise<T>;
+}
+
+export async function fetchTVInfo(id: string) {
+  const response = await fetchTVRequest<MovieVideoResult<MovieVideoInfo[]>>(
+    ENDPOINT.TV_VIDEOS.replace("{tv_id}", id.toString())
+  );
+  return response.results.filter(
+    (result) => result.site.toLowerCase() === "youtube"
+  );
+}

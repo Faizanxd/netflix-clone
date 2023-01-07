@@ -14,6 +14,9 @@ import Profile from "./pages/profile";
 import ProfilesProvider from "./common/profiles-context";
 import SignUp from "./pages/signUp";
 import Loader from "./components/loader";
+import Movies from "./pages/movies";
+import NewAndPopular from "./pages/new and popular";
+import TvShows from "./pages/Tv Shows";
 
 function ProtectedRoute({ children }: { children: React.ReactElement }) {
   const { user, loading } = useAuth();
@@ -56,8 +59,14 @@ function AppRouter() {
           <Route path="browse" element={<Layout />}>
             <Route index element={<Browse />} />
           </Route>
-          <Route path="latest" element={<Layout />}>
-            <Route index element={<h1>latest</h1>} />
+          <Route path="New&popular" element={<Layout />}>
+            <Route index element={<NewAndPopular />} />
+          </Route>
+          <Route path="Tv" element={<Layout />}>
+            <Route index element={<TvShows />} />
+          </Route>
+          <Route path="Movies" element={<Layout />}>
+            <Route index element={<Movies />} />
           </Route>
         </Route>
         <Route path="/login" element={<Login />} />
