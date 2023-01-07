@@ -30,6 +30,12 @@ export default function Profiles({ edit }: { edit: boolean }) {
   function openEditor() {
     setIsEditProfileOpen(true);
   }
+
+  function onEditProfile(profile: UserProfile) {
+    setProfile(profile);
+    openEditor();
+  }
+
   function onAddProfile() {
     const newProfile: UserProfile = {
       id: "",
@@ -47,15 +53,26 @@ export default function Profiles({ edit }: { edit: boolean }) {
     dispatch(action);
     setIsEditProfileOpen(false);
   }
+
+  function onDeleteProfile(profile: UserProfile) {
+    const action: ActionType = {
+      type: "delete",
+      payload: profile,
+    };
+    dispatch(action);
+    setIsEditProfileOpen(false);
+  }
+
   return (
     <>
       <h1 className="mb-8 text-6xl">{heading}</h1>
       <section className="flex gap-4">
         {userProfiles?.profiles?.map((profile) => (
           <ProfileCard
+            key={profile.id}
             onProfileClick={onProfileClick}
             profile={profile as UserProfile}
-            onEditClick={openEditor}
+            onEditClick={onEditProfile}
             edit={edit}
           />
         ))}
@@ -65,15 +82,18 @@ export default function Profiles({ edit }: { edit: boolean }) {
         <EditProfile
           edit={edit}
           isOpen={isEditProfileOpen}
-          title={""}
+          title=""
           onClose={closeEditor}
           profile={profile}
           onSave={onSaveProfile}
+          onDelete={onDeleteProfile}
         ></EditProfile>
       ) : null}
       {edit ? (
         <>
-          <ProfileButton>Done</ProfileButton>
+          <ProfileButton onClick={() => navigate("/")} className="mt-8">
+            Done
+          </ProfileButton>
         </>
       ) : (
         <ProfileButton
@@ -166,6 +186,7 @@ function EditProfile(props: {
   edit?: boolean;
   profile: UserProfile;
   onSave?: (profile: UserProfile) => void;
+  onDelete: (profile: UserProfile) => void;
 }) {
   const heading = props.profile.id ? "Edit Profile" : "Add Profile";
   function cancelEdit() {
@@ -188,7 +209,7 @@ function EditProfile(props: {
   return (
     <Modal {...props}>
       <section className="h-screen w-screen">
-        <form className="mx-auto my-16 max-w-4xl">
+        <form onSubmit={onSubmit} className="mx-auto my-16 max-w-4xl">
           <h1 className="mb-4 text-6xl">{heading}</h1>
           <section className="grid grid-cols-[200px_auto] gap-4 border-t border-b p-4 text-gray-100 ">
             <section className="aspect-square overflow-hidden rounded-md">
@@ -207,6 +228,15 @@ function EditProfile(props: {
           </section>
           <section className="mt-8 flex gap-4">
             <ProfileButton type="submit">Save</ProfileButton>
+            {props.profile.id ? (
+              <ProfileButton
+                buttonType="secondary"
+                type="button"
+                onClick={() => props.onDelete(props.profile)}
+              >
+                Delete Profile
+              </ProfileButton>
+            ) : null}
             <ProfileButton
               buttonType="secondary"
               onClick={cancelEdit}

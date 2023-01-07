@@ -24,7 +24,7 @@ export default function ContentRows({ title, endpoint }: RowProps) {
 
   async function fetchRowData() {
     const response = await fetchRequest<MovieResponse<MovieResult[]>>(endpoint);
-    setRowData(response.results);
+    setRowData(response.results.filter((res) => res.poster_path));
   }
 
   useEffect(() => {

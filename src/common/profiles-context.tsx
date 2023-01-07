@@ -6,7 +6,9 @@ import { ActionType, ProfilesContextType, UserProfile } from "./types";
 type StoredProfiles = Map<string, ProfilesContextType>;
 
 const ProfileContext = createContext<ProfilesContextType | null>(null);
-const ProfileDispatchContext = createContext<React.Dispatch<any> | null>(null);
+const ProfileDispatchContext = createContext<React.Dispatch<ActionType> | null>(
+  null
+);
 const LOCAL_STORAGE_KEY = "profiles";
 
 export default function ProfilesProvider({
@@ -22,7 +24,7 @@ export default function ProfilesProvider({
     if (user?.email) {
       if (state) {
         const storedProfiles = getProfiles();
-        storedProfiles.set(user.email, state);
+        storedProfiles.set(user.email, state as ProfilesContextType);
         updateProfiles(storedProfiles);
       } else {
         Dispatch({ type: "load", payload: userProfiles });
@@ -40,7 +42,7 @@ export default function ProfilesProvider({
 }
 
 function getProfiles(): StoredProfiles {
-  return new Map(JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY) || "[]"));
+  return new Map(JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY) ?? "[]"));
 }
 
 function findProfile(id: string) {
@@ -49,9 +51,9 @@ function findProfile(id: string) {
 }
 
 function updateProfiles(profiles: StoredProfiles) {
-  localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(Array(...profiles)));
+  localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(Array.from(profiles)));
 }
 
 export const useProfilesContext = () => useContext(ProfileContext);
 export const useProfilesDispatchContext = () =>
-  useContext(ProfileDispatchContext);
+  useContext(ProfileDispatchContext) as React.Dispatch<ActionType>;

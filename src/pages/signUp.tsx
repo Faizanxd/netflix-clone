@@ -1,18 +1,10 @@
-import { FormEvent, useEffect } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import netflixLogo from "../assets/Netflix_Logo_RGB.png";
 import { useAuth } from "../common/auth";
+import netflixLogo from "../assets/Netflix_Logo_RGB.png";
 
-export default function Login() {
-  const { signIn, user } = useAuth();
+export default function SignUp() {
+  const { signUp } = useAuth();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    if (user) {
-      navigate("/");
-    }
-  }, [user]);
-
   async function authenticateUser(event: React.SyntheticEvent) {
     const { email, password } = event.target as typeof event.target & {
       email: HTMLInputElement;
@@ -20,7 +12,10 @@ export default function Login() {
     };
 
     event.preventDefault();
-    await signIn(email.value, password.value);
+    const user = await signUp(email.value, password.value);
+    if (user) {
+      navigate("/login");
+    }
   }
   return (
     <>
@@ -37,7 +32,7 @@ export default function Login() {
           className="relative mx-auto  w-[450px] rounded-r-lg bg-black/75 p-16"
         >
           <article className="text-gray-300">
-            <h1 className="mb-4 text-4xl text-white">Sign In</h1>
+            <h1 className="mb-4 text-4xl text-white">Sign Up</h1>
             <section className="flex flex-col gap-4">
               <input
                 type="email"
@@ -54,17 +49,17 @@ export default function Login() {
                 placeholder="Enter Password"
               />
               <button className="my-8 rounded-md bg-netflixRed p-2 font-semibold text-white hover:bg-zinc-500/60">
-                Sign In
+                Sign Up
               </button>
             </section>
             <p>
-              New to Netflix?
+              Already Have an account?
               <NavLink
-                to={"/signUp"}
+                to={"/login"}
                 className="p-2 font-bold hover:text-netflixRed"
               >
-                Sign Up Now
-              </NavLink>
+                Login
+              </NavLink>{" "}
             </p>
           </article>
         </form>
