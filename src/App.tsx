@@ -5,18 +5,20 @@ import {
   Route,
   RouterProvider,
 } from "react-router";
+import { lazy } from "react";
+import React from "react";
 import { createBrowserRouter, Link } from "react-router-dom";
-import Browse from "./pages/browse";
-import Layout from "./components/layout";
-import Login from "./pages/login";
+const Browse = lazy(() => import("./pages/browse"));
+const Layout = lazy(() => import("./components/layout"));
+const Login = lazy(() => import("./pages/login"));
 import { AuthProvider, useAuth } from "./common/auth";
-import Profile from "./pages/profile";
+const Profile = lazy(() => import("./pages/profile"));
 import ProfilesProvider from "./common/profiles-context";
 import SignUp from "./pages/signUp";
 import Loader from "./components/loader";
-import Movies from "./pages/movies";
-import NewAndPopular from "./pages/new and popular";
-import TvShows from "./pages/Tv Shows";
+const Movies = lazy(() => import("./pages/movies"));
+const NewAndPopular = lazy(() => import("./pages/new and popular"));
+const TvShows = lazy(() => import("./pages/Tv Shows"));
 
 function ProtectedRoute({ children }: { children: React.ReactElement }) {
   const { user, loading } = useAuth();
@@ -74,7 +76,13 @@ function AppRouter() {
       </>
     )
   );
-  return loading && !user ? <Loader /> : <RouterProvider router={router} />;
+  return loading && !user ? (
+    <Loader />
+  ) : (
+    <React.Suspense fallback={<Loader />}>
+      <RouterProvider router={router} />
+    </React.Suspense>
+  );
 }
 
 export default function App() {
